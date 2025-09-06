@@ -53,6 +53,7 @@ identify==2.6.13
 idna==3.10
 isort==6.0.1
 iterative-telemetry==0.0.10
+joblib==1.5.2
 kombu==5.5.4
 markdown-it-py==4.0.0
 mccabe==0.7.0
@@ -89,6 +90,8 @@ requests==2.32.5
 rich==14.1.0
 ruamel.yaml==0.18.15
 ruamel.yaml.clib==0.2.12
+scikit-learn==1.7.1
+scipy==1.16.1
 scmrepo==3.5.2
 semver==3.0.4
 setuptools==80.9.0
@@ -99,6 +102,7 @@ six==1.17.0
 smmap==5.0.2
 sqltrie==0.11.2
 tabulate==0.9.0
+threadpoolctl==3.6.0
 tomlkit==0.13.3
 tqdm==4.67.1
 typer==0.17.4
