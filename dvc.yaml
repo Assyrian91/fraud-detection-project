@@ -12,3 +12,10 @@ stages:
     - src/features/process.py
     outs:
     - data/processed/clean.csv
+  train_model:
+    cmd: python src/models/train.py
+    deps:
+    - data/processed/clean.csv
+    - src/models/train.py
+    outs:
+    - models/model.pkl
