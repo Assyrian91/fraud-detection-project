@@ -5,3 +5,10 @@ stages:
     - src/data/load.py
     outs:
     - data/raw/data.csv
+  process_data:
+    cmd: python src/features/process.py
+    deps:
+    - data/raw/data.csv
+    - src/features/process.py
+    outs:
+    - data/processed/clean.csv
