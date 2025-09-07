@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fraud Detection</title>
+</head>
+<body>
+  <h2>Customer Churn Prediction</h2>
+  <form id="predictForm">
+    <label>Customer ID:</label><br>
+    <input type="text" id="customer_id"><br><br>
+
+    <label>Tenure:</label><br>
+    <input type="number" id="tenure"><br><br>
+
+    <label>Monthly Charges:</label><br>
+    <input type="number" step="0.01" id="monthly_charges"><br><br>
+
+    <label>Contract Type:</label><br>
+    <select id="contract_type">
+      <option>Month-to-month</option>
+      <option>One year</option>
+      <option>Two year</option>
+    </select><br><br>
+
+    <button type="submit">Predict</button>
+  </form>
+
+  <h3 id="result"></h3>
+
+  <script>
+    document.getElementById("predictForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const payload = {
+        customer_id: document.getElementById("customer_id").value,
+        features: {
+          tenure: parseInt(document.getElementById("tenure").value),
+          monthly_charges: parseFloat(document.getElementById("monthly_charges").value),
+          contract_type: document.getElementById("contract_type").value
+        }
+      };
+
+      fetch("http://3.79.29.122:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("result").innerText =
+          `Churn: ${data.churn} | Confidence: ${data.confidence}`;
+      })
+      .catch(err => {
+        document.getElementById("result").innerText = "Error connecting to API.";
+      });
+    });
+  </script>
+</body>
+</html>
