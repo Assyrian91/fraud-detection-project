@@ -1,0 +1,5 @@
+[core]
+    remote = s3remote
+['remote "s3remote"']
+    url = s3://fraud-dvc-storage
+    endpointurl = https://s3.eu-central-1.amazonaws.com
