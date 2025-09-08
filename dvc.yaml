@@ -20,13 +20,18 @@ stages:
     deps:
       - src/models/train.py
       - data/processed/features.csv
+      - params.yaml
     outs:
       - models/model.pkl
+      - data/processed/test.npz
 
   evaluate_model:
     cmd: python src/models/evaluate.py
     deps:
       - src/models/evaluate.py
       - models/model.pkl
+      - data/processed/test.npz
+      - params.yaml
     outs:
       - metrics.json
+
