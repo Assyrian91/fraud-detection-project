@@ -2,28 +2,31 @@ stages:
   load_data:
     cmd: python src/data/load.py
     deps:
-    - src/data/load.py
+      - src/data/load.py
+      - data/raw/data.csv
     outs:
-    - data/raw/data.csv
+      - data/processed/clean.csv
+
   process_data:
     cmd: python src/features/process.py
     deps:
-    - data/raw/data.csv
-    - src/features/process.py
+      - src/features/process.py
+      - data/processed/clean.csv
     outs:
-    - data/processed/clean.csv
+      - data/processed/features.csv
+
   train_model:
     cmd: python src/models/train.py
     deps:
-    - data/processed/clean.csv
-    - src/models/train.py
+      - src/models/train.py
+      - data/processed/features.csv
     outs:
-    - models/model.pkl
+      - models/model.pkl
+
   evaluate_model:
     cmd: python src/models/evaluate.py
     deps:
-    - data/processed/clean.csv
-    - models/model.pkl
-    - src/models/evaluate.py
+      - src/models/evaluate.py
+      - models/model.pkl
     outs:
-    - metrics.json
+      - metrics.json

@@ -1,12 +1,9 @@
 import pandas as pd
+import os
 
+df = pd.read_csv("data/raw/data.csv")
 
-def load_data():
-    df = pd.DataFrame(
-        {"customer_id": [1, 2, 3], "churn": [0, 1, 0], "age": [25, 40, 30]}
-    )
-    df.to_csv("data/raw/data.csv", index=False)
+df.dropna(inplace=True)
 
-
-if __name__ == "__main__":
-    load_data()
+os.makedirs("data/processed", exist_ok=True)
+df.to_csv("data/processed/clean.csv", index=False)
