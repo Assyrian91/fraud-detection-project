@@ -1,13 +1,14 @@
 data:
   raw: data/raw/data.csv
-  processed: data/processed/clean.csv
-
-model:
-  type: RandomForestClassifier
-  n_estimators: 100
-  max_depth: 5
-  random_state: 42
+  clean: data/processed/clean.csv
+  features: data/processed/features.csv
+  test_split: data/processed/test.npz
 
 train:
+  target: Class
   test_size: 0.2
-  shuffle: true
+  random_state: 42
+  model_path: models/model.pkl
+  penalty: l2
+  C: 1.0
+  max_iter: 1000
