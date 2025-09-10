@@ -47,3 +47,17 @@ def predict(data: InputData):
         "churn": bool(prediction),
         "confidence": round(float(confidence), 4) if confidence else "N/A",
     }
+
+
+# Health endpoint for deployment checks
+try:
+    app
+except NameError:
+    from fastapi import FastAPI
+
+    app = FastAPI()
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
