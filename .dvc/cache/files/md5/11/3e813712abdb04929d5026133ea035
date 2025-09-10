@@ -1,0 +1,4 @@
+customer_id,churn,age,age_group
+1,0,25,young
+2,1,40,middle
+3,0,30,young

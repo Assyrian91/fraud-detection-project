@@ -1,0 +1,15 @@
+cmd: python src/features/process.py
+deps:
+- path: data/processed/clean.csv
+  hash: md5
+  md5: 59f7e738b86be494a5083e86fefb8607
+  size: 43
+- path: src/features/process.py
+  hash: md5
+  md5: 84221d37a8e66fbdf376e975af1a54e5
+  size: 248
+outs:
+- path: data/processed/features.csv
+  hash: md5
+  md5: 59f7e738b86be494a5083e86fefb8607
+  size: 43

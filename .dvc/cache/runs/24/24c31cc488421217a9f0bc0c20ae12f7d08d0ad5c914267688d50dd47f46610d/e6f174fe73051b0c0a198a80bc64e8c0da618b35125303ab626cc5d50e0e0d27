@@ -1,0 +1,11 @@
+cmd: python src/data/load.py
+deps:
+- path: src/data/load.py
+  hash: md5
+  md5: 9cb764cadb9ec61507f0c836bb56577b
+  size: 237
+outs:
+- path: data/raw/data.csv
+  hash: md5
+  md5: 59f7e738b86be494a5083e86fefb8607
+  size: 43
