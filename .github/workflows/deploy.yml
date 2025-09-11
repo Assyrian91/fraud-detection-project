@@ -52,7 +52,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          port: 22
+          port: 2222
           script: |
             docker pull ${{ env.ECR_URI }}:latest
             sudo systemctl restart fraud-api
