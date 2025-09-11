@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-  AWS_REGION: eu-central-1
-  ECR_REPO: fraud-api
-  ECR_URI: 692653576487.dkr.ecr.eu-central-1.amazonaws.com/fraud-api
+      AWS_REGION: eu-central-1
+      ECR_REPO: fraud-api
+      ECR_URI: 692653576487.dkr.ecr.eu-central-1.amazonaws.com/fraud-api
 
     steps:
       - name: Checkout code
@@ -25,16 +25,15 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
-        run: docker build -t $ECR_REPO:latest .
+        run: docker build -t ${{ env.ECR_REPO }}:latest .
 
       - name: Tag & Push to ECR
         run: |
-          docker tag $ECR_REPO:latest $ECR_URI:latest
-          docker push $ECR_URI:latest
+          docker tag ${{ env.ECR_REPO }}:latest ${{ env.ECR_URI }}:latest
+          docker push ${{ env.ECR_URI }}:latest
 
       - name: SSH into EC2 and restart service
         uses: appleboy/ssh-action@master
@@ -43,5 +42,5 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            docker pull $ECR_URI:latest
+            docker pull ${{ env.ECR_URI }}:latest
             sudo systemctl restart fraud-api
