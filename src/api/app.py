@@ -27,7 +27,6 @@ def predict(data: InputData):
         "contract_type": data.features.contract_type,
     }
     df = pd.DataFrame([features])
-
     df = pd.get_dummies(df)
 
     for col in model.feature_names_in_:
@@ -47,15 +46,6 @@ def predict(data: InputData):
         "churn": bool(prediction),
         "confidence": round(float(confidence), 4) if confidence else "N/A",
     }
-
-
-# Health endpoint for deployment checks
-try:
-    app
-except NameError:
-    from fastapi import FastAPI
-
-    app = FastAPI()
 
 
 @app.get("/health")
