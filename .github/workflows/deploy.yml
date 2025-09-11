@@ -1,311 +1,41 @@
-# .github/workflows/mlops-pipeline.yml
-name: MLOps Pipeline - Fraud Detection
+name: Deploy Fraud API
 
 on:
   push:
-    branches: [main, develop]
-  pull_request:
     branches: [main]
-  schedule:
-    - cron: '0 2 * * *'  # Daily retraining check at 2 AM
-
-env:
-  AWS_REGION: eu-central-1
-  ECR_REPO: fraud-api
-  ECR_URI: 692653576487.dkr.ecr.eu-central-1.amazonaws.com/fraud-api
-  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
-  MODEL_REGISTRY: ${{ secrets.MODEL_REGISTRY }}
 
 jobs:
-  # ==================== DATA VALIDATION ====================
-  data-quality:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'schedule'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install great-expectations evidently
-          
-      - name: Run Data Quality Checks
-        run: |
-          python src/data/validate.py --config configs/prod.yaml
-          python src/data/quality.py --check-drift
-          
-      - name: Upload Data Quality Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: data-quality-report
-          path: reports/data_quality_*.html
 
-  # ==================== CODE QUALITY & TESTS ====================
-  code-quality:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          
-      - name: Code Formatting (Black)
-        run: black --check src/ tests/
-        
-      - name: Code Linting (Flake8)
-        run: flake8 src/ tests/
-        
-      - name: Type Checking (MyPy)
-        run: mypy src/
-        
-      - name: Security Scan (Bandit)
-        run: bandit -r src/
-        
-      - name: Run Unit Tests
-        run: |
-          pytest tests/unit/ -v --cov=src --cov-report=xml
-          
-      - name: Run Integration Tests
-        run: |
-          pytest tests/integration/ -v
-          
-      - name: Upload Coverage Reports
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
+    env:
+      AWS_REGION: eu-central-1
+      ECR_REPO: fraud-api
+      ECR_URI: 692653576487.dkr.ecr.eu-central-1.amazonaws.com/fraud-api
 
-  # ==================== MODEL VALIDATION ====================
-  model-validation:
-    runs-on: ubuntu-latest
-    needs: [data-quality, code-quality]
-    
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install mlflow
-          
+        uses: actions/checkout@v3
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-          
-      - name: Download Latest Data
-        run: |
-          python src/data/load.py --env prod
-          
-      - name: Validate Current Model Performance
-        run: |
-          python src/models/evaluate.py --model-stage production
-          
-      - name: Check Model Drift
-        run: |
-          python src/monitoring/drift_detection.py --days 7
-          
-      - name: Model Bias Testing
-        run: |
-          pytest tests/model_tests/test_model_bias.py -v
-          
-      - name: A/B Test Setup (if needed)
-        run: |
-          python src/models/registry.py --setup-ab-test
-          
-      - name: Upload Model Validation Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: model-validation-report
-          path: reports/model_validation_*.html
 
-  # ==================== CONDITIONAL RETRAINING ====================
-  auto-retrain:
-    runs-on: ubuntu-latest
-    needs: [model-validation]
-    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[retrain]')
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install mlflow
-          
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-          
-      - name: Check Retraining Trigger
-        id: check-retrain
-        run: |
-          RETRAIN_NEEDED=$(python src/training/scheduler.py --check-trigger)
-          echo "retrain_needed=$RETRAIN_NEEDED" >> $GITHUB_OUTPUT
-          
-      - name: Run Model Retraining
-        if: steps.check-retrain.outputs.retrain_needed == 'true'
-        run: |
-          python src/training/pipeline.py --config configs/prod.yaml
-          
-      - name: Validate New Model
-        if: steps.check-retrain.outputs.retrain_needed == 'true'
-        run: |
-          python src/models/validation.py --new-model
-          
-      - name: Register New Model
-        if: steps.check-retrain.outputs.retrain_needed == 'true'
-        run: |
-          python src/models/registry.py --register-champion
-          
-      - name: Upload Training Report
-        if: steps.check-retrain.outputs.retrain_needed == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: training-report
-          path: reports/training_*.html
-
-  # ==================== SECURITY SCANNING ====================
-  security-scan:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # ==================== BUILD & PUSH ====================
-  build-and-push:
-    runs-on: ubuntu-latest
-    needs: [code-quality, model-validation, security-scan]
-    if: github.ref == 'refs/heads/main'
-    
-    outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
-      image-digest: ${{ steps.build.outputs.digest }}
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-          
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
-        
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.ECR_URI }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-            
-      - name: Build and push Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            MODEL_VERSION=${{ github.sha }}
-            BUILD_DATE=${{ steps.meta.outputs.labels['org.opencontainers.image.created'] }}
 
-  # ==================== STAGING DEPLOYMENT ====================
-  deploy-staging:
-    runs-on: ubuntu-latest
-    needs: [build-and-push]
-    environment: staging
-    
-    steps:
-      - name: Deploy to Staging
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          port: 2222
-          script: |
-            docker pull ${{ env.ECR_URI }}:${{ github.sha }}
-            docker stop fraud-api-staging || true
-            docker run -d --name fraud-api-staging \
-              -p 8080:8080 \
-              -e ENVIRONMENT=staging \
-              -e MODEL_STAGE=staging \
-              --restart unless-stopped \
-              ${{ env.ECR_URI }}:${{ github.sha }}
-              
-      - name: Run Smoke Tests
-        run: |
-          sleep 30
-          python tests/smoke_tests.py --host ${{ secrets.STAGING_HOST }} --port 8080
-          
-      - name: Run Load Tests
-        run: |
-          python tests/load_tests.py --host ${{ secrets.STAGING_HOST }}
+      - name: Build Docker image
+        run: docker build -t ${{ env.ECR_REPO }}:latest .
 
-  # ==================== PRODUCTION DEPLOYMENT ====================
-  deploy-production:
-    runs-on: ubuntu-latest
-    needs: [deploy-staging, auto-retrain]
-    environment: production
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-      - name: Blue-Green Deployment Setup
+      - name: Tag & Push to ECR
+        run: |
+          docker tag ${{ env.ECR_REPO }}:latest ${{ env.ECR_URI }}:latest
+          docker push ${{ env.ECR_URI }}:latest
+
+      - name: Upload SSH key to EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -313,23 +43,10 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 2222
           script: |
-            # Pull new image
-            docker pull ${{ env.ECR_URI }}:${{ github.sha }}
-            
-            # Start new container (Green)
-            docker run -d --name fraud-api-green \
-              -p 8081:8080 \
-              -e ENVIRONMENT=production \
-              -e MODEL_STAGE=production \
-              --restart unless-stopped \
-              ${{ env.ECR_URI }}:${{ github.sha }}
-              
-      - name: Health Check New Deployment
-        run: |
-          sleep 45
-          python tests/health_check.py --host ${{ secrets.EC2_HOST }} --port 8081
-          
-      - name: Switch Traffic (Blue-Green)
+            echo "${{ secrets.EC2_KEY }}" > ~/fraud-key.pem
+            chmod 400 ~/fraud-key.pem
+
+      - name: SSH into EC2 and restart service
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -337,74 +54,5 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 2222
           script: |
-            # Update nginx to point to new container
-            sudo sed -i 's/8080/8081/g' /etc/nginx/sites-available/fraud-api
-            sudo nginx -s reload
-            
-            # Stop old container
-            docker stop fraud-api-blue || true
-            docker rm fraud-api-blue || true
-            
-            # Rename containers
-            docker rename fraud-api fraud-api-blue || true
-            docker rename fraud-api-green fraud-api
-            
-            # Update port mapping
-            docker stop fraud-api
-            docker run -d --name fraud-api \
-              -p 8080:8080 \
-              -e ENVIRONMENT=production \
-              -e MODEL_STAGE=production \
-              --restart unless-stopped \
-              ${{ env.ECR_URI }}:${{ github.sha }}
-
-  # ==================== POST-DEPLOYMENT MONITORING ====================
-  post-deploy-monitoring:
-    runs-on: ubuntu-latest
-    needs: [deploy-production]
-    
-    steps:
-      - name: Setup Monitoring Alerts
-        run: |
-          python src/monitoring/alerts.py --setup-post-deployment
-          
-      - name: Trigger Model Performance Monitoring
-        run: |
-          python src/monitoring/performance_metrics.py --start-monitoring
-          
-      - name: Send Deployment Notification
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          channel: '#fraud-detection'
-          message: |
-            🚀 Fraud Detection Model Deployed Successfully!
-            📊 Model Version: ${{ github.sha }}
-            🏷️ Image: ${{ env.ECR_URI }}:${{ github.sha }}
-            📈 Monitoring: Active
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-
-  # ==================== CLEANUP ====================
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: [deploy-production]
-    if: always()
-    
-    steps:
-      - name: Cleanup Old Images
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          port: 2222
-          script: |
-            # Keep only last 5 images
-            docker images ${{ env.ECR_URI }} --format "table {{.Repository}}:{{.Tag}}" | tail -n +6 | xargs -r docker rmi
-            
-            # Cleanup unused containers
-            docker container prune -f
-            
-            # Cleanup unused volumes
-            docker volume prune -f
+            docker pull ${{ env.ECR_URI }}:latest
+            sudo systemctl restart fraud-api
