@@ -11,7 +11,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       ECR_REPO: fraud-api
-      ECR_URI: 123456789012.dkr.ecr.us-east-1.amazonaws.com/fraud-api
+      ECR_URI: 692653576487.dkr.ecr.us-east-1.amazonaws.com/fraud-api
 
     steps:
       - name: Checkout code
