@@ -1,4 +1,7 @@
 # 🛡️ Credit Card Fraud Detection System
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![Tests](https://github.com/AssyriaNathraq/fraud-detection-project/workflows/Tests/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 A comprehensive end-to-end machine learning project for detecting fraudulent credit card transactions, featuring real-time prediction APIs, model training pipeline, and deployment-ready structure.
 
