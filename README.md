@@ -1,21 +1,21 @@
-#🛡️ Credit Card Fraud Detection System
+# 🛡️ Credit Card Fraud Detection System
 
 A comprehensive end-to-end machine learning project for detecting fraudulent credit card transactions, featuring real-time prediction APIs, model training pipeline, and deployment-ready structure.
 
 ⸻
 
-#⚙️ Quick Setup
+# ⚙️ Quick Setup
 
 Dataset not included — see DATA_SETUP.md for instructions.
 
 ## 1️⃣ Download data from Kaggle
 ## 2️⃣ Install dependencies
-pip install -r requirements.txt
+	pip install -r requirements.txt
 
 ## 3️⃣ Train model
-python scripts/train_model.py
+	python scripts/train_model.py
 
-#📚 Table of Contents
+# 📚 Table of Contents
 	•	Features
 	•	Project Structure
 	•	Installation
@@ -30,17 +30,17 @@ python scripts/train_model.py
 	•	Contact
 	•	Roadmap
 
-#✨ Features
+# ✨ Features
 
-✅ Multiple ML Models (Logistic Regression, Random Forest, XGBoost, LightGBM)
-✅ Advanced Preprocessing (SMOTE, StandardScaler, Feature Engineering)
-✅ REST API using FastAPI
-✅ Interactive Dashboard (Dash)
-✅ Model Monitoring and Logging (Loguru)
-✅ Docker-ready
-✅ CI/CD Workflows (GitHub Actions)
+	✅ Multiple ML Models (Logistic Regression, Random Forest, XGBoost, LightGBM)
+	✅ Advanced Preprocessing (SMOTE, StandardScaler, Feature Engineering)
+	✅ REST API using FastAPI
+	✅ Interactive Dashboard (Dash)
+	✅ Model Monitoring and Logging (Loguru)
+	✅ Docker-ready
+	✅ CI/CD Workflows (GitHub Actions)
 
-#📁 Project Structure
+# 📁 Project Structure
 	fraud_detection/
 	├── src/
 	│   ├── api/                # FastAPI application
@@ -69,7 +69,7 @@ python scripts/train_model.py
 	└── README.md
 
 
-#🚀 Installation
+# 🚀 Installation
 
 Prerequisites
 	•	Python 3.8+
@@ -77,7 +77,7 @@ Prerequisites
 	•	Git
 	•	(Optional) Docker
 
-#Steps
+# Steps
 ## Clone repository
 	git clone https://github.com/Assyrian91/fraud-detection-project.git
 	cd fraud-detection-project
@@ -92,7 +92,7 @@ Prerequisites
 ## Configure environment
 	copy .env.example .env
 
-#📥 Data Setup
+# 📥 Data Setup
 	1.	Download dataset from Kaggle – Credit Card Fraud Detection
 
 	2.	Place creditcard.csv inside:
@@ -103,9 +103,9 @@ Prerequisites
 		unzip creditcardfraud.zip -d data/raw/
 
 
-#📖 Usage
+# 📖 Usage
 
-##1️⃣ Data Preprocessing
+## 1️⃣ Data Preprocessing
 	python -c "
 	from src.data.preprocessing import DataPreprocessor
 	p = DataPreprocessor()
@@ -113,21 +113,21 @@ Prerequisites
 	X_train, X_test, y_train, y_test = p.preprocess_pipeline(df)
 	"
 
-##2️⃣ Model Training
+## 2️⃣ Model Training
 	python -c "
 	from src.models.train import ModelTrainer
 	trainer = ModelTrainer()
 	trainer.train_and_compare_models()
 	trainer.save_model()
 	"
-##3️⃣ Run API
+## 3️⃣ Run API
 	uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
 	Swagger Docs → http://localhost:8000/docs
 
 
-#📊 Model Performance
+# 📊 Model Performance
 
-##Best Model: XGBoost
+## Best Model: XGBoost
 	Metric		Score
 	Accuracy	99.95%
 	Precision	95.2%
@@ -135,14 +135,14 @@ Prerequisites
 	F1 Score	92.4%
 	ROC AUC		98.3%
 
-##Confusion Matrix:
+## Confusion Matrix:
 		Predicted
         	         0      1
 	Actual  0    56,850    12
         	1        8     92
 ______________________________
 
-#📚 API Documentation
+# 📚 API Documentation
 	Method		Endpoint		Description
 	GET		/			Root endpoint
 	GET		/health			Health check
@@ -152,29 +152,29 @@ ______________________________
 	GET		/model/info		Model details
 	POST		/model/threshold	Update prediction threshold
 
-#🧪 Testing
+# 🧪 Testing
 	pytest
 	pytest --cov=src --cov-report=html
 	pytest tests/test_model.py::TestModelTrainer::test_train_single_model -v
 
 
-#🐳 Docker Deployment
+# 🐳 Docker Deployment
 	# Build and run
 	docker build -t fraud-detection .
 	docker run -p 8000:8000 fraud-detection
-##Using Docker Compose:
+## Using Docker Compose:
 	docker-compose up --build -d
 
 ⸻
 
-#🔧 Configuration
+# 🔧 Configuration
 
 .env file example:
 	API_HOST=0.0.0.0
 	API_PORT=8000
 	FRAUD_THRESHOLD=0.5
 	LOG_LEVEL=INFO
-#🤝 Contributing
+# 🤝 Contributing
 	1.	Fork the repository
 	2.	Create feature branch → git checkout -b feature/your-feature
 	3.	Commit changes → git commit -m "Add new feature"
@@ -189,13 +189,13 @@ Code Style:
 
 ⸻
 
-#📄 License
+# 📄 License
 
 Licensed under the MIT License — see LICENSE.
 
 ⸻
 
-#👨‍💻 Author
+# 👨‍💻 Author
 
 Khoshaba Odeesho – Data Analyst & ML Developer
 	•	GitHub: Assyrian91
@@ -204,7 +204,7 @@ Khoshaba Odeesho – Data Analyst & ML Developer
 
 ⸻
 
-#🗺️ Roadmap
+# 🗺️ Roadmap
 	•	Add SHAP/LIME explainability
 	•	Real-time streaming predictions
 	•	A/B testing framework
@@ -215,4 +215,4 @@ Khoshaba Odeesho – Data Analyst & ML Developer
 
 ⸻
 
-#⭐ Star this repository if you find it helpful!
+# ⭐ Star this repository if you find it helpful!
