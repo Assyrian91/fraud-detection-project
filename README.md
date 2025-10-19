@@ -1,6 +1,6 @@
 # 🛡️ Credit Card Fraud Detection Project
 
-## ⚠️ Important: Data Setup Required
+### ⚠️ Important: Data Setup Required
 
 The dataset is **not included** in this repository. Please see [DATA_SETUP.md](DATA_SETUP.md) for download instructions.
 
