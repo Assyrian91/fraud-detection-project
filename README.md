@@ -1,6 +1,9 @@
 # 🛡️ Credit Card Fraud Detection Project
 
-### ⚠️ Important: Data Setup Required
+
+A comprehensive machine learning system for detecting fraudulent credit card transactions using advanced ML techniques and real-time prediction API.
+
+## ⚠️ Important: Data Setup Required
 
 The dataset is **not included** in this repository. Please see [DATA_SETUP.md](DATA_SETUP.md) for download instructions.
 
@@ -15,9 +18,8 @@ pip install -r requirements.txt
 # 3. Train model
 python scripts/train_model.py
 
-A comprehensive machine learning system for detecting fraudulent credit card transactions using advanced ML techniques and real-time prediction API.
 
-## 📋 Table of Contents
+### 📋 Table of Contents
 
 - [Features](#features)
 - [Project Structure](#project-structure)
