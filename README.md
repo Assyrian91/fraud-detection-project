@@ -18,8 +18,8 @@ pip install -r requirements.txt
 # 3. Train model
 python scripts/train_model.py
 
-
-### 📋 Table of Contents
+____________________________________________________________
+## 📋 Table of Contents
 
 - [Features](#features)
 - [Project Structure](#project-structure)
