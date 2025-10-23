@@ -14,11 +14,11 @@ A comprehensive end-to-end machine learning project for detecting fraudulent cre
 
 Dataset not included — see DATA_SETUP.md for instructions.
 
-## 1️⃣ Download data from Kaggle
-## 2️⃣ Install dependencies
+ 1️⃣ Download data from Kaggle
+ 2️⃣ Install dependencies
 	pip install -r requirements.txt
 
-## 3️⃣ Train model
+ 3️⃣ Train model
 	python scripts/train_model.py
 
 # 📚 Table of Contents
