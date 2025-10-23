@@ -1,6 +1,6 @@
 {
     "model_name": "Random Forest",
-    "saved_at": "2025-10-18T11:58:11.026801",
+    "saved_at": "2025-10-21T22:34:21.227806",
     "config": {
         "random_state": 42,
         "test_size": 0.2
