@@ -1,8 +1,10 @@
 # 🛡️ Credit Card Fraud Detection System
+![CI/CD](https://github.com/AssyriaNathraq/fraud-detection-project/workflows/CI%2FCD%20Pipeline/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
-![Tests](https://github.com/AssyriaNathraq/fraud-detection-project/workflows/Tests/badge.svg)
-![License](https://img.shields.io/badge/license-MIT-green)
-
+![FastAPI](https://img.shields.io/badge/FastAPI-0.103-green)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/Assyrian91/fraud-detection-project)
 A comprehensive end-to-end machine learning project for detecting fraudulent credit card transactions, featuring real-time prediction APIs, model training pipeline, and deployment-ready structure.
 
 ⸻
